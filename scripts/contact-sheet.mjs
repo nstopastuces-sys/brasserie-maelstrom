@@ -12,7 +12,6 @@ const shots = [];
 const logs = new Set();
 for (const url of urls) {
   const page = await browser.newPage({ viewport: { width: W, height: H } });
-  await page.addInitScript(() => { try { localStorage.setItem('maelstrom-age-ok', '1'); } catch {} });
   page.on('pageerror', (e) => logs.add(`[pageerror] ${e.message}`));
   page.on('console', (m) => m.type() === 'error' && logs.add(`[error] ${m.text()}`));
   await page.goto(url, { waitUntil: 'networkidle' });

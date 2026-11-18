@@ -17,7 +17,6 @@ const page = await browser.newPage({
   deviceScaleFactor: 1,
   reducedMotion: process.env.REDUCED === '1' ? 'reduce' : 'no-preference',
 });
-  await page.addInitScript(() => { try { localStorage.setItem('maelstrom-age-ok', '1'); } catch {} });
 const logs = [];
 page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));

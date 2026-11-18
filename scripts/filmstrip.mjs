@@ -8,7 +8,6 @@ const W = Number(w);
 const H = Number(h);
 const browser = await chromium.launch({ args: ['--use-angle=d3d11', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: W, height: H } });
-await page.addInitScript(() => { try { localStorage.setItem('maelstrom-age-ok', '1'); } catch {} });
 const logs = new Set();
 page.on('pageerror', (e) => logs.add(`[pageerror] ${e.message}`));
 page.on('console', (m) => m.type() === 'error' && logs.add(`[error] ${m.text()}`));

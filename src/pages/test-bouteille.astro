@@ -27,7 +27,7 @@ import '@fontsource-variable/inter';
 
       const list = beers;
       const params = new URLSearchParams(location.search);
-      const stage = new Stage({ canvas: document.getElementById('c') as HTMLCanvasElement, lowPower: false });
+      const stage = await Stage.create({ canvas: document.getElementById('c') as HTMLCanvasElement, lowPower: false });
       const spin = params.get('spin') !== '0';
 
       async function show(i: number) {

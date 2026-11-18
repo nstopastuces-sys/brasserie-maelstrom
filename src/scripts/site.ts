@@ -1,11 +1,9 @@
 // Comportements communs à toutes les pages : défilement lissé (Lenis),
-// en-tête, menu mobile, curseur, bannière d'âge, filtres de la gamme.
+// en-tête, menu mobile, curseur, filtres de la gamme.
 
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import { gsap } from 'gsap';
-
-const AGE_KEY = 'maelstrom-age-ok';
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -20,7 +18,6 @@ export function initSite() {
 
   initHeader();
   initCursor();
-  initAgeGate(lenis);
   initRange(scrollTo);
 }
 
@@ -64,42 +61,6 @@ function initCursor() {
     cursor.classList.toggle('is-link', !!t.closest('a, button'));
   });
   document.addEventListener('pointerleave', () => cursor.classList.remove('is-visible'));
-}
-
-/* Bannière d'âge : mémorisée en localStorage (protégé : navigation privée, etc.). */
-function initAgeGate(lenis: Lenis | null) {
-  const gate = document.querySelector<HTMLElement>('[data-age-gate]');
-  if (!gate) return;
-  let ok = false;
-  try {
-    ok = localStorage.getItem(AGE_KEY) === '1';
-  } catch {
-    /* stockage indisponible : on redemandera */
-  }
-  if (ok) return;
-  gate.hidden = false;
-  lenis?.stop();
-  const yes = gate.querySelector<HTMLButtonElement>('[data-age-yes]')!;
-  yes.focus();
-  yes.addEventListener('click', () => {
-    try {
-      localStorage.setItem(AGE_KEY, '1');
-    } catch {
-      /* rien à faire */
-    }
-    gsap.to(gate, {
-      autoAlpha: 0,
-      duration: 0.4,
-      onComplete: () => {
-        gate.hidden = true;
-        lenis?.start();
-      },
-    });
-  });
-  gate.querySelector('[data-age-no]')!.addEventListener('click', () => {
-    gate.querySelector('[data-age-text]')!.textContent =
-      'Reviens nous voir à ta majorité ! En attendant, le site reste réservé aux adultes.';
-  });
 }
 
 /* Gamme : filtres + clic sur une carte = la bière s'affiche dans le carrousel. */

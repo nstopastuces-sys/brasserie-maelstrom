@@ -208,16 +208,24 @@ function drawCollar(beer: Beer): HTMLCanvasElement {
   return c;
 }
 
-export function createBottleKit(renderer: THREE.WebGLRenderer): BottleKit {
+/** Rend la main au navigateur entre deux étapes lourdes (pas de longue tâche bloquante). */
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+
+export async function createBottleKit(renderer: THREE.WebGLRenderer): Promise<BottleKit> {
   const anisotropy = renderer.capabilities.getMaxAnisotropy();
   const loader = new THREE.TextureLoader();
   const labels = new Map<string, Promise<THREE.Texture>>();
   const collars = new Map<string, THREE.Texture>();
+  // Les deux éclairages d'environnement sont calculés en deux temps.
+  const envMap = studioEnvironment(renderer);
+  await nextFrame();
+  const envSoft = softEnvironment(renderer);
+  await nextFrame();
 
   return {
     renderer,
-    envMap: studioEnvironment(renderer),
-    envSoft: softEnvironment(renderer),
+    envMap,
+    envSoft,
     glass: new THREE.LatheGeometry(glassProfile(), 64),
     liquid: new THREE.LatheGeometry(liquidProfile(), 48),
     // Cylindre ouvert, centré sur la face avant (theta = 0 regarde la caméra).

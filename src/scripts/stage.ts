@@ -14,13 +14,11 @@ export interface StageOptions {
 const FOV = 26;
 
 export class Stage {
-  readonly kit: BottleKit;
   active: Bottle;
   incoming: Bottle;
   /** Demi-largeur visible (unités monde) + marge : position de sortie d'écran. */
   exitX = 40;
 
-  private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera = new THREE.PerspectiveCamera(FOV, 1, 1, 400);
   private group = new THREE.Group(); // suit le curseur et flotte doucement
@@ -28,10 +26,12 @@ export class Stage {
   private pointer = new THREE.Vector2();
   private timer = new THREE.Timer();
   private running = false;
+  private started = false;
   private visible = true;
   private frame = 0;
 
-  constructor(private opts: StageOptions) {
+  /** Création asynchrone : l'initialisation lourde est découpée pour ne pas figer la page. */
+  static async create(opts: StageOptions): Promise<Stage> {
     const r = new THREE.WebGLRenderer({
       canvas: opts.canvas, antialias: true, alpha: true, powerPreference: 'high-performance',
     });
@@ -41,9 +41,15 @@ export class Stage {
     // Neutral plutôt qu'ACES : respecte mieux les couleurs des étiquettes.
     r.toneMapping = THREE.NeutralToneMapping;
     r.toneMappingExposure = 1.05;
-    this.renderer = r;
+    const kit = await createBottleKit(r);
+    return new Stage(opts, r, kit);
+  }
 
-    this.kit = createBottleKit(r);
+  private constructor(
+    private opts: StageOptions,
+    private renderer: THREE.WebGLRenderer,
+    readonly kit: BottleKit,
+  ) {
     this.scene.environment = this.kit.envMap;
     this.scene.environmentIntensity = 0.5;
 
@@ -79,6 +85,16 @@ export class Stage {
     const ready = await Promise.race([tex, timeout]).catch(() => null);
     if (ready) bottle.setBeer(beer, ready);
     else tex.then((t) => bottle.setLabel(beer, t)).catch(() => {});
+  }
+
+  /** Compile les shaders sans figer la page (compilation parallèle du GPU quand elle existe). */
+  async warmup() {
+    this.incoming.root.visible = true; // compile aussi les matériaux de la 2e bouteille
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } finally {
+      this.incoming.root.visible = false;
+    }
   }
 
   /** Précharge les étiquettes en tâche de fond. */
@@ -120,12 +136,14 @@ export class Stage {
     // sur mobile la bouteille remonte pour laisser la place aux infos
     this.baseY = visibleH * (portrait ? 0.1 : 0.035);
     this.exitX = (visibleH / 2) * aspect + 9;
-    if (!this.running) this.render();
+    // pas de rendu avant warmup() : il compilerait tous les shaders d'un bloc
+    if (this.started && !this.running) this.render();
   }
 
   start() {
     if (this.running || !this.visible) return;
     this.running = true;
+    this.started = true;
     this.timer.reset(); // pas de saut après une pause
     const loop = (now: number) => {
       if (!this.running) return;

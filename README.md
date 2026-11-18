@@ -35,6 +35,8 @@ ne sont pas fournis (`null` dans `src/data/beers.json`).
   l'angle, reflets de studio), ce qui est aussi plus léger sur mobile.
 - **Tone mapping** : `NeutralToneMapping` plutôt qu'ACES, pour respecter les couleurs des étiquettes.
 - **Nom** : l'étiquette indique « Patcha Mama » ; le slug reste `pachamama`.
+- **Bannière d'âge** : retirée de la démo. Elle est obligatoire au lancement (cf. cahier des charges)
+  et sera réintroduite sans flou plein écran derrière elle.
 
 ## Commandes
 
@@ -76,7 +78,7 @@ node scripts/filmstrip.mjs http://localhost:4321/ film.png 1440 900 "100,300,500
 
 ```
 src/
-  components/   BeerCarousel (hero), Header, Footer, AgeGate, RangeGrid, OpenDays, ProsBlock, Story…
+  components/   BeerCarousel (hero), Header, Footer, RangeGrid, OpenDays, ProsBlock, Story…
   data/         beers.json (une entrée par bière) et types
   layouts/      Base.astro (SEO, polices, en-tête, pied de page)
   pages/        index, test-bouteille

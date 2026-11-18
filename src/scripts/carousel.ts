@@ -26,6 +26,8 @@ if (import.meta.env.DEV) (window as unknown as { __gsap: typeof gsap }).__gsap =
 type Dir = 1 | -1;
 
 const AUTOPLAY_DELAY = 6; // secondes
+/** Accélération globale de la transition : ≈ 1,25 s de chorégraphie jouée en ≈ 0,9 s. */
+const SPEED = 1.4;
 
 /** Emplacements des ingrédients (en % du hero) : autour de la bouteille,
  *  hors des zones de texte. d = profondeur de parallaxe. */
@@ -100,6 +102,7 @@ class Carousel {
   private dots: HTMLButtonElement[];
   private live: HTMLElement;
   private pauseBtn: HTMLButtonElement;
+  private hint: HTMLElement | null;
   private foam: HTMLElement;
   private fill: HTMLElement;
   private measureCtx = document.createElement('canvas').getContext('2d')!;
@@ -118,6 +121,7 @@ class Carousel {
     this.dots = [...root.querySelectorAll<HTMLButtonElement>('.dot')];
     this.live = q('[data-live]');
     this.pauseBtn = q('[data-pause]');
+    this.hint = root.querySelector('[data-hint]');
     this.foam = q('.wave-layer--foam');
     this.fill = q('.wave-layer--fill');
 
@@ -172,7 +176,7 @@ class Carousel {
   }
 
   /** Couleurs globales (en-tête, boutons, curseur, crêtes). */
-  private applyColors(i: number, animate: boolean, delay = 0) {
+  private applyColors(i: number, animate: boolean, delay = 0, duration = 0.6) {
     const beer = this.beers[i];
     const vars = {
       '--beer': beer.color,
@@ -181,7 +185,7 @@ class Carousel {
       '--fg': this.fg[i],
     };
     const html = document.documentElement;
-    if (animate) gsap.to(html, { ...vars, duration: 0.6, delay, ease: 'power2.inOut' });
+    if (animate) gsap.to(html, { ...vars, duration, delay, ease: 'power2.inOut' });
     else gsap.set(html, vars);
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', beer.color);
   }
@@ -403,7 +407,7 @@ class Carousel {
 
     // 2. vague de mousse + couleurs globales
     tl.add(this.waveTimeline(beer), 0);
-    this.applyColors(i, true, 0.25);
+    this.applyColors(i, true, 0.25 / SPEED, 0.6 / SPEED);
 
     // 3. nom géant lettre par lettre
     const oldName = this.name;
@@ -465,11 +469,11 @@ class Carousel {
       gsap.fromTo(
         this.info.querySelectorAll('[data-reveal]'),
         { autoAlpha: 0, y: 18 },
-        { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.06, ease: 'expo.out' },
+        { autoAlpha: 1, y: 0, duration: 0.6 / SPEED, stagger: 0.06 / SPEED, ease: 'expo.out' },
       );
     }, [], 0.62);
 
-    return tl;
+    return tl.timeScale(SPEED);
   }
 
   /** Animations réduites : fondus de couleur simples, pas de rotation ni de vague. */
@@ -522,8 +526,9 @@ class Carousel {
     try {
       const { Stage } = await import('./stage');
       const lowPower = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 760;
-      const stage = new Stage({ canvas: this.canvas, lowPower });
+      const stage = await Stage.create({ canvas: this.canvas, lowPower });
       await stage.prepare(stage.active, this.beers[this.index]);
+      await stage.warmup();
       this.stage = stage;
       // entrée de la première bouteille : elle monte en tournant
       const a = stage.active;
@@ -586,10 +591,19 @@ class Carousel {
 
   /** Première interaction : le défilement automatique s'arrête. */
   private interact() {
+    this.hideHint();
     if (!this.userStopped) {
       this.userStopped = true;
       this.syncAutoplay();
     }
+  }
+
+  /** L'indication « Glisse la bouteille » disparaît dès que le visiteur a compris. */
+  private hideHint() {
+    const hint = this.hint;
+    if (!hint) return;
+    this.hint = null;
+    gsap.to(hint, { autoAlpha: 0, y: 8, duration: 0.4, ease: 'power2.in', onComplete: () => hint.remove() });
   }
 
   /* ------------------------------------------------------------------ */

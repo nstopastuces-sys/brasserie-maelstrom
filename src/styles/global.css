@@ -220,9 +220,9 @@ ol {
   background: var(--fg);
 }
 .cursor.is-drag {
-  width: 86px;
-  height: 86px;
-  margin: -43px 0 0 -43px;
+  width: 112px;
+  height: 112px;
+  margin: -56px 0 0 -56px;
 }
 .cursor.is-drag .cursor__label {
   opacity: 1;
