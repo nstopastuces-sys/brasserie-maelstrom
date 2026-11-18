@@ -1,0 +1,250 @@
+/* ==========================================================================
+   Brasserie Maelström — styles globaux
+   Site sobre (noir profond, blanc cassé) : c'est la bière active qui colore.
+   ========================================================================== */
+
+:root {
+  --ink: #0f0e0c;
+  --ink-2: #1a1916;
+  --paper: #f4efe6;
+  --paper-dim: #b9b2a5;
+  --line: rgb(244 239 230 / 0.14);
+
+  /* couleurs de la bière active (mises à jour par le carrousel) */
+  --beer: #3e9b57;
+  --deep: #25693a;
+  --accent: #e23a6e;
+  --fg: #111110;
+
+  --font-display: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --font-text: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --gutter: clamp(16px, 3vw, 44px);
+  --ridge: clamp(70px, 14vh, 160px);
+  --radius: 18px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-text);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 200;
+  padding: 10px 16px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 99px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Texture de grain légère sur tout le site */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------------
+   Boutons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.85em 1.4em;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-out), background-color 0.3s, color 0.3s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+}
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  transition: transform 0.35s var(--ease-out);
+}
+.btn:hover svg {
+  transform: translateX(3px);
+}
+.btn--solid {
+  background: var(--paper);
+  color: var(--ink);
+}
+.btn--beer {
+  background: var(--beer);
+  color: var(--fg);
+}
+.btn--ghost {
+  background: transparent;
+  color: inherit;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.kicker {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 7vw, 6.5rem);
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+}
+
+/* --------------------------------------------------------------------------
+   Curseur personnalisé (souris uniquement)
+   -------------------------------------------------------------------------- */
+
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 150;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--beer);
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out), margin 0.35s var(--ease-out),
+    background-color 0.3s, opacity 0.3s;
+}
+.cursor__label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--beer);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.cursor.is-visible {
+  opacity: 1;
+}
+.cursor.is-hero {
+  background: var(--fg);
+}
+.cursor.is-drag {
+  width: 86px;
+  height: 86px;
+  margin: -43px 0 0 -43px;
+}
+.cursor.is-drag .cursor__label {
+  opacity: 1;
+}
+.cursor.is-link {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  opacity: 0.35;
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

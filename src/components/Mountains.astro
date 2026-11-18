@@ -1,0 +1,42 @@
+---
+// Silhouette de crêtes savoyardes en bas du hero.
+// Crête arrière : couleur foncée de la bière ; crête avant : noir du site
+// (elle se raccorde à la section suivante). Petites neiges sur les sommets.
+---
+<svg class="mountains" viewBox="0 0 1440 200" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <path
+    class="mountains__back"
+    d="M0 200V118L80 96L150 108L250 58L320 86L410 70L505 100L590 84L668 112L740 104L820 74L870 86L960 50L1040 80L1120 60L1205 92L1290 72L1370 94L1440 82V200Z"
+  />
+  <path
+    class="mountains__snow"
+    d="M250 58L232 67L246 66L258 72L270 66L284 70ZM960 50L940 61L955 60L966 67L978 60L992 64ZM1120 60L1104 68L1117 68L1127 73L1138 68Z"
+  />
+  <path
+    class="mountains__front"
+    d="M0 200V150L64 134L140 146L218 116L290 136L372 126L460 150L548 142L630 160L720 166L806 158L890 140L966 150L1046 120L1124 140L1214 128L1296 150L1376 136L1440 146V200Z"
+  />
+</svg>
+
+<style>
+  .mountains {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    width: 100%;
+    height: var(--ridge);
+    pointer-events: none;
+  }
+  .mountains__back {
+    fill: var(--deep);
+    transition: fill 0.8s;
+  }
+  .mountains__snow {
+    fill: var(--paper);
+    opacity: 0.9;
+  }
+  .mountains__front {
+    fill: var(--ink);
+  }
+</style>

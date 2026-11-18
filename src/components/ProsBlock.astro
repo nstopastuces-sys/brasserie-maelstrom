@@ -1,0 +1,113 @@
+---
+// Bloc Pros : restaurants, bars, cavistes. Démo : arguments et formats à valider.
+const points = [
+  {
+    title: 'Fûts et bouteilles 33 cl',
+    text: 'Pression ou bouteille, on s\'adapte à ta carte et à ton débit.',
+    icon: 'M7 3h10v4l2 3v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9l2-3zM5 12h14M5 16h14',
+  },
+  {
+    title: 'Fiches techniques',
+    text: 'Style, degré, accords mets : tout pour briefer ton équipe en salle.',
+    icon: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',
+  },
+  {
+    title: 'En direct de la brasserie',
+    text: 'Un interlocuteur, pas un standard. On parle bière, et on livre.',
+    icon: 'M4 18h11V7H4zM15 11h3l3 3v4h-6M7.5 20.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM17.5 20.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z',
+  },
+];
+---
+<section class="pros" id="pros" aria-labelledby="pros-title">
+  <div class="pros__intro">
+    <p class="kicker">Restaurants · Bars · Cavistes</p>
+    <h2 class="section-title" id="pros-title">Mets du Maelström à ta carte.</h2>
+    <p class="pros__lead">
+      Des bières savoyardes avec du caractère, brassées à la Mandallaz.
+      Demande les tarifs pros, on te répond vite.
+    </p>
+    <div class="pros__actions">
+      <a class="btn btn--beer" href="#pros">
+        Demander les tarifs
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+      <a class="btn btn--ghost" href="#pros">Fiches techniques (PDF)</a>
+    </div>
+  </div>
+  <ul class="pros__points">
+    {points.map((p) => (
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d={p.icon} /></svg>
+        <div>
+          <h3>{p.title}</h3>
+          <p>{p.text}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .pros {
+    margin: 0 var(--gutter);
+    padding: clamp(32px, 6vw, 80px);
+    border-radius: calc(var(--radius) * 1.6);
+    background: var(--paper);
+    color: var(--ink);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(32px, 6vw, 90px);
+    align-items: center;
+  }
+  .pros .kicker {
+    margin-bottom: 14px;
+  }
+  .pros__lead {
+    margin: 20px 0 28px;
+    font-size: 1.1rem;
+    max-width: 44ch;
+  }
+  .pros__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pros .btn--beer {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .pros__points {
+    display: grid;
+    gap: 14px;
+  }
+  .pros__points li {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: rgb(15 14 12 / 0.05);
+  }
+  .pros__points svg {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    border-radius: 12px;
+    background: var(--beer);
+    color: var(--fg);
+    transition: background-color 0.6s, color 0.6s;
+  }
+  .pros__points h3 {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+  }
+  .pros__points p {
+    color: #4a463f;
+    font-size: 0.95rem;
+  }
+  @media (max-width: 900px) {
+    .pros {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

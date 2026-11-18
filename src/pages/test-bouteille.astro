@@ -1,0 +1,62 @@
+---
+// Page de contrôle de la bouteille 3D (non indexée).
+import beers from '../data/beers.json';
+import '@fontsource-variable/inter';
+---
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Test bouteille — Maelström</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #3E9B57; transition: background .6s; font-family: 'Inter Variable', sans-serif; }
+      canvas { position: fixed; inset: 0; width: 100%; height: 100%; }
+      nav { position: fixed; left: 16px; right: 16px; bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; z-index: 2; }
+      button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 99px; border: 0; background: #111; color: #fff; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <nav id="nav">
+      {beers.map((b, i) => <button data-i={i}>{b.name}</button>)}
+    </nav>
+    <script>
+      import beers from '../data/beers.json';
+      import type { Beer } from '../data/types';
+      import { Stage } from '../scripts/stage';
+
+      const list = beers as Beer[];
+      const params = new URLSearchParams(location.search);
+      const stage = new Stage({ canvas: document.getElementById('c') as HTMLCanvasElement, lowPower: false });
+      const spin = params.get('spin') !== '0';
+
+      async function show(i: number) {
+        const beer = list[i];
+        document.body.style.background = beer.color;
+        await stage.prepare(stage.active, beer);
+      }
+      document.getElementById('nav')!.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest('button');
+        if (b) show(Number(b.dataset.i));
+      });
+      // rotation lente pour inspecter la bouteille sous tous les angles
+      if (spin) {
+        const tick = () => { stage.active.root.rotation.y += 0.004; requestAnimationFrame(tick); };
+        tick();
+      }
+      const ry = params.get('ry');
+      if (ry) stage.active.root.rotation.y = Number(ry);
+      stage.tune({
+        env: params.has('env') ? Number(params.get('env')) : undefined,
+        exposure: params.has('exp') ? Number(params.get('exp')) : undefined,
+      });
+      const idle = params.get('idle');
+      if (idle) stage.active.idle = Number(idle);
+      await show(Number(params.get('b') ?? 0));
+      stage.start();
+      window.addEventListener('resize', () => stage.resize());
+      (window as any).__ready = true;
+    </script>
+  </body>
+</html>

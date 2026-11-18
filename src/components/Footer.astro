@@ -1,0 +1,106 @@
+---
+// Pied de page : coordonnées (à compléter), liens, mention sanitaire obligatoire (loi Évin).
+const year = new Date().getFullYear();
+---
+<footer class="site-footer" id="contact">
+  <div class="footer__top">
+    <p class="footer__brand" aria-hidden="true">Maelström</p>
+    <div class="footer__cols">
+      <div>
+        <p class="kicker">La brasserie</p>
+        <address>
+          Brassée à la Mandallaz<br />
+          Haute-Savoie<br />
+          <span class="todo">Adresse complète à compléter</span>
+        </address>
+      </div>
+      <div>
+        <p class="kicker">Horaires</p>
+        <p><span class="todo">Horaires de la boutique à compléter</span></p>
+      </div>
+      <div>
+        <p class="kicker">Suivre</p>
+        <ul>
+          <li><a href="#" rel="noopener">Instagram</a></li>
+          <li><a href="#" rel="noopener">Facebook</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="kicker">Infos</p>
+        <ul>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">Confidentialité</a></li>
+          <li><a href="/#pros">Espace pros</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer__health">
+    L'abus d'alcool est dangereux pour la santé, à consommer avec modération.
+  </p>
+
+  <div class="footer__bottom">
+    <p>© {year} Brasserie Maelström</p>
+    <p class="footer__demo">Démo de présentation — textes et dates provisoires</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: clamp(56px, 8vw, 110px) var(--gutter) 28px;
+    border-top: 1px solid var(--line);
+  }
+  .footer__top {
+    display: grid;
+    gap: 40px;
+  }
+  .footer__brand {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: clamp(4rem, 17vw, 16rem);
+    line-height: 0.82;
+    color: var(--beer);
+    transition: color 0.6s;
+  }
+  .footer__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 28px;
+  }
+  .footer__cols .kicker {
+    color: var(--paper-dim);
+    margin-bottom: 10px;
+  }
+  address {
+    font-style: normal;
+  }
+  .footer__cols a {
+    text-decoration: none;
+  }
+  .footer__cols a:hover {
+    text-decoration: underline;
+  }
+  .todo {
+    color: var(--paper-dim);
+    font-style: italic;
+  }
+  .footer__health {
+    margin-top: 56px;
+    padding: 16px 0;
+    border-block: 1px solid var(--line);
+    font-weight: 700;
+    text-align: center;
+  }
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-top: 20px;
+    font-size: 0.85rem;
+    color: var(--paper-dim);
+  }
+</style>

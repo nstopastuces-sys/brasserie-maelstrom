@@ -1,0 +1,26 @@
+---
+// Accueil : carrousel hero + aperçu des sections (gamme, portes ouvertes, pros, brasserie).
+import Base from '../layouts/Base.astro';
+import BeerCarousel from '../components/BeerCarousel.astro';
+import RangeGrid from '../components/RangeGrid.astro';
+import OpenDays from '../components/OpenDays.astro';
+import ProsBlock from '../components/ProsBlock.astro';
+import Story from '../components/Story.astro';
+import beersData from '../data/beers.json';
+import type { Beer } from '../data/types';
+import { textOn } from '../scripts/color';
+
+const beers = beersData as Beer[];
+const first = beers[0];
+---
+<Base
+  title="Brasserie Maelström — bières artisanales de Haute-Savoie"
+  description="12 bières, 12 univers : IPA, stout, porter et gamme bio brassés à la Mandallaz. Espace pros pour les restaurants, bars et cavistes, et portes ouvertes à la brasserie."
+  theme={{ beer: first.color, deep: first.colorDeep, accent: first.accent, fg: textOn(first.color) }}
+>
+  <BeerCarousel beers={beers} />
+  <OpenDays />
+  <RangeGrid beers={beers} />
+  <ProsBlock />
+  <Story />
+</Base>

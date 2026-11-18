@@ -1,0 +1,148 @@
+---
+// Toute la gamme : grille filtrable. Un clic sur une carte affiche la bière
+// dans le carrousel (et remonte en haut de page).
+import type { Beer } from '../data/types';
+import { RANGE_LABEL } from '../data/types';
+import { textOn } from '../scripts/color';
+
+interface Props {
+  beers: Beer[];
+}
+const { beers } = Astro.props;
+const filters = [
+  { id: 'all', label: 'Toutes' },
+  { id: 'ipa', label: 'IPA' },
+  { id: 'pale', label: 'Pale' },
+  { id: 'stout-porter', label: 'Stout / Porter' },
+  { id: 'bio', label: 'Bio' },
+];
+---
+<section class="range" id="la-gamme" aria-labelledby="range-title" data-range>
+  <div class="range__head">
+    <div>
+      <p class="kicker">12 bières, 12 univers</p>
+      <h2 class="section-title" id="range-title">Toute la gamme</h2>
+    </div>
+    <div class="filters" role="group" aria-label="Filtrer les bières">
+      {filters.map((f, i) => (
+        <button type="button" class="filter" data-filter={f.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+          {f.label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <ul class="range__grid">
+    {beers.map((b) => (
+      <li
+        class="card"
+        data-card
+        data-category={b.category}
+        data-organic={String(b.organic)}
+        style={`--c:${b.color};--d:${b.colorDeep};--t:${textOn(b.color)}`}
+      >
+        <a class="card__link" href={`#${b.slug}`} data-show={b.slug}>
+          <div class="card__label">
+            <img src={b.label} alt={`Étiquette de la ${b.name}`} width="1024" height="637" loading="lazy" decoding="async" />
+          </div>
+          <div class="card__meta">
+            <h3 class="card__name">{b.name}</h3>
+            <p class="card__style">{b.style} · {RANGE_LABEL[b.range]}</p>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .range {
+    padding: clamp(80px, 11vw, 150px) var(--gutter);
+  }
+  .range__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .range .kicker {
+    color: var(--beer);
+    margin-bottom: 12px;
+    transition: color 0.6s;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filter {
+    padding: 0.6em 1.1em;
+    border-radius: 99px;
+    border: 0;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--line);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .filter:hover {
+    box-shadow: inset 0 0 0 1.5px var(--paper);
+  }
+  .filter[aria-pressed='true'] {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .range__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: clamp(12px, 1.6vw, 22px);
+  }
+  .card[hidden] {
+    display: none;
+  }
+  .card__link {
+    display: grid;
+    gap: 18px;
+    height: 100%;
+    padding: 18px 18px 22px;
+    border-radius: var(--radius);
+    background: var(--c);
+    color: var(--t);
+    text-decoration: none;
+    perspective: 900px;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .card__label {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.25);
+    transform: rotateY(-8deg) rotateX(3deg);
+    transition: transform 0.7s var(--ease-out), box-shadow 0.7s var(--ease-out);
+  }
+  .card__label img {
+    width: 100%;
+    height: auto;
+  }
+  .card__link:hover .card__label,
+  .card__link:focus-visible .card__label {
+    transform: rotateY(8deg) rotateX(-2deg) translateY(-6px) scale(1.03);
+    box-shadow: 0 28px 50px rgb(0 0 0 / 0.32);
+  }
+  .card__name {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+    line-height: 0.95;
+  }
+  .card__style {
+    margin-top: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+</style>

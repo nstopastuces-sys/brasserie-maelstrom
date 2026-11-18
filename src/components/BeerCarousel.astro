@@ -1,0 +1,490 @@
+---
+// Carrousel hero : une bière = un univers de couleur.
+// Calques (arrière → avant) : fond couleur, vague de mousse, nom géant,
+// ingrédients, bouteille 3D (canvas), crêtes, infos et commandes.
+// Tout le texte existe en HTML réel (SEO, lecteurs d'écran) ; le JS anime.
+import type { Beer } from '../data/types';
+import { RANGE_LABEL } from '../data/types';
+import { textOn } from '../scripts/color';
+import { approxWidth } from '../scripts/name-fit';
+import IngredientSprite from './IngredientSprite.astro';
+import Mountains from './Mountains.astro';
+
+interface Props {
+  beers: Beer[];
+}
+const { beers } = Astro.props;
+const first = beers[0];
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// Premier rendu du nom géant (sans JS) : découpage en mots, taille en vw/vh.
+const words = first.name.toUpperCase().split(' ');
+const lines = words.length > 1 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : words;
+const widest = Math.max(...lines.map(approxWidth));
+const nameSize = `min(22vw, ${(94 / widest).toFixed(2)}vw, ${(80 / (lines.length * 0.86)).toFixed(2)}vh)`;
+---
+<section
+  class="hero"
+  id="bieres"
+  aria-roledescription="carrousel"
+  aria-label="Nos bières"
+  style={`background-color:${first.color}`}
+  data-carousel
+>
+  <h1 class="sr-only">Brasserie Maelström — bières artisanales brassées à la Mandallaz, en Haute-Savoie</h1>
+
+  <div class="hero__wave" aria-hidden="true">
+    <div class="wave-layer wave-layer--foam">
+      <svg class="wave-crest" preserveAspectRatio="none"><path></path></svg>
+      <div class="wave-body"></div>
+    </div>
+    <div class="wave-layer wave-layer--fill">
+      <svg class="wave-crest" preserveAspectRatio="none"><path></path></svg>
+      <div class="wave-body"></div>
+    </div>
+  </div>
+
+  <div class="hero__name" aria-hidden="true">
+    <div class="name" style={`color:${first.colorDeep};font-size:${nameSize}`}>
+      {lines.map((l) => <span class="name__line">{l}</span>)}
+    </div>
+  </div>
+
+  <div class="hero__ingredients" aria-hidden="true"></div>
+
+  <div class="hero__fallback" aria-hidden="true">
+    <img src={first.label} alt="" width="1024" height="637" fetchpriority="high" />
+  </div>
+
+  <canvas class="hero__canvas" aria-hidden="true"></canvas>
+
+  <Mountains />
+
+  <div class="hero__info" data-info>
+    <p class="info__count" data-reveal><span data-count>01</span> / {pad(beers.length)}</p>
+    <h2 class="info__style" data-reveal>
+      <span class="sr-only">{first.name}, </span>{first.style}
+    </h2>
+    <ul class="info__tags" data-reveal>
+      {first.formats.map((f) => <li>{f}</li>)}
+      <li>{RANGE_LABEL[first.range]}</li>
+    </ul>
+    <p class="info__tagline" data-reveal>{first.tagline}</p>
+    <div class="info__actions" data-reveal>
+      <a class="btn info__cta" href={`#${first.slug}`} data-discover>
+        Découvrir
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+      <a class="info__link" href="/#pros">Demander un tarif</a>
+    </div>
+  </div>
+
+  <div class="hero__controls">
+    <ol class="dots" aria-label="Choisir une bière">
+      {beers.map((b, i) => (
+        <li>
+          <button
+            class="dot"
+            type="button"
+            data-index={i}
+            aria-label={`${b.name}, ${b.style}`}
+            aria-current={i === 0 ? 'true' : undefined}
+          >
+            <span class="dot__num">{pad(i + 1)}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+    <div class="arrows">
+      <button class="round" type="button" data-pause aria-pressed="false">
+        <span class="sr-only" data-pause-label>Mettre en pause le défilement</span>
+        <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" /></svg>
+        <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor" /></svg>
+      </button>
+      <button class="round" type="button" data-prev>
+        <span class="sr-only">Bière précédente</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      </button>
+      <button class="round round--solid" type="button" data-next>
+        <span class="sr-only">Bière suivante</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </button>
+    </div>
+  </div>
+
+  <p class="sr-only" aria-live="polite" data-live></p>
+
+  <!-- Liste réelle des bières, pour le SEO et les lecteurs d'écran -->
+  <ul class="sr-only">
+    {beers.map((b) => (
+      <li><a href={`#${b.slug}`}>{b.name}</a> — {b.style}. {b.tagline}</li>
+    ))}
+  </ul>
+
+  <IngredientSprite />
+  <script type="application/json" data-beers set:html={JSON.stringify(beers)} />
+  <script type="application/json" data-fg set:html={JSON.stringify(beers.map((b) => textOn(b.color)))} />
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--fg);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .hero > * {
+    position: absolute;
+  }
+
+  /* Vague de mousse (couche crème) puis de bière (couleur suivante) */
+  .hero__wave {
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .wave-layer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(110vh);
+    will-change: transform;
+  }
+  .wave-crest {
+    width: 100%;
+    height: var(--crest, 120px);
+    flex: none;
+    overflow: visible;
+    display: block;
+  }
+  .wave-body {
+    height: calc(max(100svh, 560px) + 40px);
+    margin-top: -1px;
+  }
+  .wave-layer--foam path {
+    fill: #f3ebdc;
+  }
+  .wave-layer--foam .wave-body {
+    background: #f3ebdc;
+  }
+
+  /* Nom géant derrière la bouteille */
+  .hero__name {
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    padding-bottom: 6vh;
+    pointer-events: none;
+  }
+  :global(.name) {
+    grid-area: 1 / 1;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 0.86;
+    white-space: nowrap;
+    letter-spacing: -0.005em;
+  }
+  :global(.name__line) {
+    display: block;
+    overflow: hidden;
+    padding: 0.05em 0.04em 0;
+    margin-top: -0.05em;
+  }
+
+  .hero__ingredients {
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  :global(.ing) {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+    transform: translate3d(calc(var(--px, 0) * var(--d) * 34px), calc(var(--py, 0) * var(--d) * 22px), 0);
+    transition: transform 0.9s var(--ease-out);
+  }
+  :global(.ing__anim) {
+    width: 100%;
+    height: 100%;
+  }
+  :global(.ing svg) {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: var(--ing-fill);
+    stroke: var(--ing-stroke);
+    stroke-width: 2.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    animation: ing-float 6s ease-in-out infinite alternate;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes ing-float {
+    from {
+      transform: translateY(-6%) rotate(var(--r));
+    }
+    to {
+      transform: translateY(6%) rotate(calc(var(--r) + 8deg));
+    }
+  }
+
+  .hero__canvas {
+    inset: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s;
+    cursor: grab;
+  }
+  .hero__canvas.is-ready {
+    opacity: 1;
+  }
+  .hero.is-dragging .hero__canvas {
+    cursor: grabbing;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero__canvas {
+      cursor: none;
+    }
+  }
+
+  /* Repli 2D : étiquette en carte inclinée (sans WebGL ou animations réduites) */
+  .hero__fallback {
+    inset: 0;
+    z-index: 4;
+    display: none;
+    place-items: center;
+    padding-bottom: 8vh;
+    pointer-events: none;
+  }
+  .hero.is-fallback .hero__fallback {
+    display: grid;
+  }
+  .hero__fallback :global(img) {
+    grid-area: 1 / 1;
+    width: min(46vw, 440px);
+    height: auto;
+    border-radius: 14px;
+    box-shadow: 0 30px 60px rgb(0 0 0 / 0.35);
+    transform: rotate(-4deg);
+  }
+
+  .hero :global(.mountains) {
+    z-index: 6;
+  }
+
+  /* Infos de la bière active */
+  .hero__info {
+    z-index: 10;
+    left: var(--gutter);
+    bottom: calc(var(--ridge) * 0.62 + 16px);
+    width: min(400px, calc(100% - 2 * var(--gutter)));
+    display: grid;
+    gap: 10px;
+  }
+  .hero__info :global(.info__count) {
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+  }
+  .hero__info :global(.info__style) {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .hero__info :global(.info__tags) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .hero__info :global(.info__tags li) {
+    padding: 3px 10px;
+    border-radius: 99px;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .hero__info :global(.info__tagline) {
+    font-size: 1.02rem;
+    font-weight: 500;
+    max-width: 34ch;
+  }
+  .hero__info :global(.info__actions) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 6px;
+  }
+  .hero__info :global(.info__cta) {
+    background: var(--fg);
+    color: var(--beer);
+  }
+  .hero__info :global(.info__link) {
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-underline-offset: 4px;
+  }
+
+  /* Pastilles et flèches */
+  .hero__controls {
+    z-index: 10;
+    right: var(--gutter);
+    bottom: calc(var(--ridge) * 0.62 + 16px);
+    display: grid;
+    justify-items: end;
+    gap: 14px;
+  }
+  .dots {
+    display: flex;
+    gap: 2px;
+  }
+  .dot {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.55;
+    transition: opacity 0.3s;
+  }
+  .dot::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 4px;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+  .dot::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 4px;
+    height: 2px;
+    z-index: 1;
+    background: currentColor;
+    transform: scaleX(var(--p, 0));
+    transform-origin: left;
+  }
+  .dot:hover,
+  .dot[aria-current='true'] {
+    opacity: 1;
+  }
+  .dot[aria-current='true'] {
+    --p: 1;
+  }
+  .arrows {
+    display: flex;
+    gap: 10px;
+  }
+  .round {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 0;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+    cursor: pointer;
+    transition: transform 0.35s var(--ease-out), background-color 0.3s;
+  }
+  .round:hover {
+    transform: scale(1.06);
+  }
+  .round svg {
+    width: 22px;
+    height: 22px;
+  }
+  .round--solid {
+    background: var(--fg);
+    color: var(--beer);
+    box-shadow: none;
+  }
+  .icon-play {
+    display: none;
+  }
+  [data-pause][aria-pressed='true'] .icon-play {
+    display: block;
+  }
+  [data-pause][aria-pressed='true'] .icon-pause {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .dot__num {
+      display: none;
+    }
+    .dot {
+      width: 14px;
+      height: 30px;
+    }
+    .dot::before,
+    .dot::after {
+      left: 3px;
+      right: 3px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .hero__name {
+      place-items: start center;
+      padding: 14vh 0 0;
+    }
+    .hero__info {
+      bottom: calc(var(--ridge) * 0.4 + 12px);
+      gap: 8px;
+    }
+    .hero__info :global(.info__tagline) {
+      font-size: 0.95rem;
+    }
+    .hero__info {
+      width: calc(100% - 2 * var(--gutter) - 60px);
+    }
+    .hero__controls {
+      top: auto;
+      bottom: calc(var(--ridge) * 0.4 + 12px);
+    }
+    .dots {
+      display: none;
+    }
+    .arrows {
+      flex-direction: column;
+    }
+    .round {
+      width: 46px;
+      height: 46px;
+    }
+  }
+</style>
+
+<script>
+  import { initCarousel } from '../scripts/carousel';
+  const el = document.querySelector<HTMLElement>('[data-carousel]');
+  if (el) initCarousel(el);
+</script>
