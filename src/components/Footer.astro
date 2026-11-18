@@ -1,5 +1,6 @@
 ---
 // Pied de page : coordonnées (à compléter), liens, mention sanitaire obligatoire (loi Évin).
+import { withBase } from '../scripts/paths';
 const year = new Date().getFullYear();
 ---
 <footer class="site-footer" id="contact">
@@ -30,7 +31,7 @@ const year = new Date().getFullYear();
         <ul>
           <li><a href="#">Mentions légales</a></li>
           <li><a href="#">Confidentialité</a></li>
-          <li><a href="/#pros">Espace pros</a></li>
+          <li><a href={withBase('/#pros')}>Espace pros</a></li>
         </ul>
       </div>
     </div>

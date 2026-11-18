@@ -22,11 +22,10 @@ import '@fontsource-variable/inter';
       {beers.map((b, i) => <button data-i={i}>{b.name}</button>)}
     </nav>
     <script>
-      import beers from '../data/beers.json';
-      import type { Beer } from '../data/types';
+      import { beers } from '../data/beers';
       import { Stage } from '../scripts/stage';
 
-      const list = beers as Beer[];
+      const list = beers;
       const params = new URLSearchParams(location.search);
       const stage = new Stage({ canvas: document.getElementById('c') as HTMLCanvasElement, lowPower: false });
       const spin = params.get('spin') !== '0';

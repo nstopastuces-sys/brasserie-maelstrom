@@ -6,11 +6,9 @@ import RangeGrid from '../components/RangeGrid.astro';
 import OpenDays from '../components/OpenDays.astro';
 import ProsBlock from '../components/ProsBlock.astro';
 import Story from '../components/Story.astro';
-import beersData from '../data/beers.json';
-import type { Beer } from '../data/types';
+import { beers } from '../data/beers';
 import { textOn } from '../scripts/color';
 
-const beers = beersData as Beer[];
 const first = beers[0];
 ---
 <Base

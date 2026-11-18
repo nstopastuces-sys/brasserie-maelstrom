@@ -1,9 +1,12 @@
-// Configuration Astro — site 100 % statique, déployé sur Netlify.
+// Configuration Astro — site 100 % statique.
+// Publication : GitHub Pages (sous-dossier /brasserie-maelstrom/, via le workflow
+// .github/workflows/deploy-pages.yml) ou Netlify (racine, via netlify.toml).
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  // URL provisoire, à remplacer par le domaine définitif.
-  site: 'https://brasserie-maelstrom.netlify.app',
+  // Fournis par le workflow GitHub Pages ; valeurs par défaut pour Netlify et le local.
+  site: process.env.SITE_URL || 'https://brasserie-maelstrom.netlify.app',
+  base: process.env.BASE_PATH || '/',
   trailingSlash: 'ignore',
   vite: {
     build: {

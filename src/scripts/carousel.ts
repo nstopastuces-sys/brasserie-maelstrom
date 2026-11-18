@@ -255,7 +255,7 @@ class Carousel {
         <a class="btn info__cta" href="#la-gamme" data-discover>Découvrir
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a class="info__link" href="/#pros">Demander un tarif</a>
+        <a class="info__link" href="#pros">Demander un tarif</a>
       </div>`;
   }
 

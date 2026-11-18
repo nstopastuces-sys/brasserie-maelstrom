@@ -1,14 +1,16 @@
 ---
 // En-tête minimal : logo texte, menu, bouton « Espace pros ».
+import { withBase } from '../scripts/paths';
+
 const links = [
-  { href: '/#la-gamme', label: 'Nos bières' },
-  { href: '/#portes-ouvertes', label: 'Portes ouvertes' },
-  { href: '/#brasserie', label: 'La brasserie' },
-  { href: '/#contact', label: 'Contact' },
+  { href: withBase('/#la-gamme'), label: 'Nos bières' },
+  { href: withBase('/#portes-ouvertes'), label: 'Portes ouvertes' },
+  { href: withBase('/#brasserie'), label: 'La brasserie' },
+  { href: withBase('/#contact'), label: 'Contact' },
 ];
 ---
 <header class="site-header" data-header>
-  <a class="brand" href="/" aria-label="Brasserie Maelström, accueil">
+  <a class="brand" href={withBase('/')} aria-label="Brasserie Maelström, accueil">
     <span class="brand__small">Brasserie</span>
     <span class="brand__name">Maelström</span>
   </a>
@@ -19,7 +21,7 @@ const links = [
     </ul>
   </nav>
 
-  <a class="btn header-pros" href="/#pros">Espace pros</a>
+  <a class="btn header-pros" href={withBase('/#pros')}>Espace pros</a>
 
   <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="menu">
     <span class="sr-only">Menu</span>

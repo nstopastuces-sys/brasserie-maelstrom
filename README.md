@@ -86,9 +86,30 @@ public/labels/  étiquettes WebP
 netlify.toml    build + en-têtes de sécurité (CSP, HSTS…)
 ```
 
-## Déploiement Netlify
+## Mise en ligne
 
-1. Sur Netlify : « Add new site » → « Import an existing project » → GitHub → ce dépôt.
+### Démo : GitHub Pages
+
+Chaque push sur `main` construit et publie le site via
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) :
+**https://nstopastuces-sys.github.io/brasserie-maelstrom/**
+
+Le site y est servi dans un sous-dossier : tous les chemins internes passent par `withBase()`
+(`src/scripts/paths.ts`) et les données des bières par `src/data/beers.ts`. Le dossier et l'URL
+sont fournis au build par les variables `BASE_PATH` et `SITE_URL`. Sans elles, le site est
+construit pour la racine (Netlify, local).
+
+Sur Pages, les en-têtes de sécurité de `netlify.toml` (CSP, HSTS…) ne s'appliquent pas.
+
+### Non-indexation
+
+La démo n'est pas indexée : balise `<meta name="robots" content="noindex, nofollow">` sur toutes
+les pages, et en-tête `X-Robots-Tag` côté Netlify. Au lancement du vrai site : construire avec
+`PUBLIC_INDEXABLE=true` et retirer `X-Robots-Tag` de `netlify.toml`.
+
+### Production : Netlify
+
+1. Sur Netlify : « Add new project » → « Import an existing project » → GitHub → ce dépôt.
 2. Les réglages sont lus dans `netlify.toml` (build `npm run build`, dossier `dist`, Node 24).
 3. Chaque push sur `main` redéploie le site.
 
